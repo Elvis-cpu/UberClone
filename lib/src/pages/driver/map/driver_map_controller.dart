@@ -1,9 +1,17 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location;
+import 'package:progress_dialog/progress_dialog.dart';
+import 'package:uber_clone/src/models/driver.dart';
+import 'package:uber_clone/src/providers/auth_provider.dart';
+import 'package:uber_clone/src/providers/driver_provider.dart';
+import 'package:uber_clone/src/providers/geofire_provider.dart';
+import 'package:uber_clone/src/utils/my_progress_dialog.dart';
 import 'package:uber_clone/src/utils/snackbar.dart' as utils;
 
 class DriverMapController {
@@ -14,7 +22,7 @@ class DriverMapController {
 
   CameraPosition initialPosotion = CameraPosition(
     target: LatLng(19.2451224, -103.7163459),
-    zoom: 15.5,
+    zoom: 14.0,
   );
 
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
@@ -22,14 +30,52 @@ class DriverMapController {
   Position _position;
   StreamSubscription<Position> _positionStream;
 
+  Driver driver;
+
   BitmapDescriptor markerDriver;
 
-  Future init(BuildContext context, Function refresh) async {
-    this.refresh = refresh;
-    this.context = context;
+  GeofireProvider _geofireProvider;
+  AuthProvider _authProvider;
+  DriverProvider _driverProvider;
 
+  bool isConnect = false;
+  ProgressDialog _progressDialog;
+
+  StreamSubscription<DocumentSnapshot> _statusSuscription;
+  StreamSubscription<DocumentSnapshot> _driverInfoSuscription;
+
+  Future init(BuildContext context, Function refresh) async {
+    this.context = context;
+    this.refresh = refresh;
+    _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
+    _geofireProvider  = new  GeofireProvider();
+    _authProvider = new AuthProvider();
+    _driverProvider = new DriverProvider();
     markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
     checkGPS();
+    getDriverInfo();
+  }
+
+
+
+  void getDriverInfo () {
+    Stream<DocumentSnapshot> driverStream = _driverProvider.getByIdStream(_authProvider.getUser().uid);
+    _driverInfoSuscription = driverStream.listen((DocumentSnapshot document) {
+      driver = Driver.fromJson(document.data());
+      refresh();
+    });
+  }
+
+  void dispose () {
+    _positionStream?.cancel();
+    _statusSuscription?.cancel();
+    _driverInfoSuscription?.cancel();
+  }
+
+  void SignOut () async{
+    await _authProvider.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, 'home', (route) => false);
+
   }
 
   void onMapCreated(GoogleMapController controller) {
@@ -46,11 +92,15 @@ class DriverMapController {
           CameraPosition(
             bearing: 0,
             target: LatLng(latitude, longitude),
-            zoom: 16,
+            zoom: 13.6,
           ),
         ),
       );
     }
+  }
+
+  void openDrawer(){
+    key.currentState.openDrawer();
   }
 
   void centerPosition() {
@@ -61,13 +111,48 @@ class DriverMapController {
     }
   }
 
+  void saveLocation ()async {
+    await _geofireProvider.create(_authProvider.getUser().uid, _position.latitude, _position.longitude);
+    _progressDialog.hide();
+  }
+
+  void connect(){
+    if (isConnect) {
+      disconnect();
+    }else{
+      _progressDialog.show();
+      updateLocation();
+    }
+  }
+
+  void disconnect () {
+    _positionStream?.cancel();
+    _geofireProvider.delete(_authProvider.getUser().uid);
+
+  }
+
+  void checkIfIsConnect(){
+    Stream<DocumentSnapshot> status = _geofireProvider.getLocationByIdStream(_authProvider.getUser().uid);
+    _statusSuscription = status.listen((DocumentSnapshot document) {
+      if (document.exists) {
+        isConnect = true;
+      }else {
+        isConnect = false;
+      }
+
+      refresh();
+
+    });
+  }
+
   void updateLocation() async {
     try {
       await _determinePosition();
-      _position = await Geolocator
-          .getLastKnownPosition(); // obtener la ultima posicion ubicado
+      _position = await Geolocator.getLastKnownPosition(); // obtener la ultima posicion ubicado
       centerPosition();
-      addMarker('Driver', _position.latitude, _position.longitude,
+      saveLocation();
+
+      addMarker('driver', _position.latitude, _position.longitude,
           'Tu posicion', '', markerDriver);
       refresh();
       _positionStream = Geolocator.getPositionStream(
@@ -75,9 +160,11 @@ class DriverMapController {
         distanceFilter: 1,
       ).listen((Position position) {
         _position = position;
-        addMarker('Driver', _position.latitude, _position.longitude,
+        addMarker(
+            'Driver', _position.latitude, _position.longitude,
             'Tu posicion', '', markerDriver);
         animateCamaraToPsition(_position.latitude, _position.longitude);
+        saveLocation();
         refresh();
       });
     } catch (error) {
@@ -86,16 +173,19 @@ class DriverMapController {
   }
 
   void checkGPS() async {
-    bool isLocationEnable = await Geolocator.isLocationServiceEnabled();
-    if (isLocationEnable) {
+    bool isLocationEnabled = await Geolocator.isLocationServiceEnabled();
+    if (isLocationEnabled) {
       print('GPS activado');
       updateLocation();
+      checkIfIsConnect();
     } else {
       print('GPS no activado');
       bool locationGPS = await location.Location().requestService();
       if (locationGPS) {
         updateLocation();
+        checkIfIsConnect();
         print('activo gps');
+
       }
     }
   }
@@ -137,14 +227,15 @@ class DriverMapController {
     return await Geolocator.getCurrentPosition();
   }
 
+
 //crearun marcador des una imagen
   Future<BitmapDescriptor> createMarkerImageFromAsset(String path) async {
     ImageConfiguration configuration = ImageConfiguration();
-    BitmapDescriptor bitmapDescriptor =
-        await BitmapDescriptor.fromAssetImage(configuration, path);
+    BitmapDescriptor bitmapDescriptor = await BitmapDescriptor.fromAssetImage(configuration, path);
     return bitmapDescriptor;
   }
 
+// agregar un marcador
   void addMarker(String markerId, double lat, double lng, String title,
       String content, BitmapDescriptor iconMarker) {
     MarkerId id = MarkerId(markerId);
@@ -153,6 +244,11 @@ class DriverMapController {
       icon: iconMarker,
       position: LatLng(lat, lng),
       infoWindow: InfoWindow(title: title, snippet: content),
+      draggable: false,
+      zIndex: 2,
+      flat: true,
+      anchor: Offset(0.5, 0.5),
+      rotation: _position.heading,
     );
     // añadimos nuevo marcador
     markers[id] = marker;
