@@ -8,6 +8,8 @@ import 'package:uber_clone/src/pages/login/login_page.dart';
 import 'package:uber_clone/src/pages/client/register/client_register_page.dart';
 import 'package:uber_clone/src/utils/colors.dart' as utils;
 
+
+//
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
