@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_clone/src/pages/driver/map/driver_map_controller.dart';
-import 'package:uber_clone/src/utils/colors.dart' as utils;
 import 'package:uber_clone/src/widgets/button_app.dart';
 
 class DriverMapPage extends StatefulWidget {
@@ -21,6 +20,9 @@ class _DriverMapPageState extends State<DriverMapPage> {
     super.initState();
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       _con.init(context, refresh);
+
+
+
     }) ;
   }
 
@@ -69,6 +71,7 @@ class _DriverMapPageState extends State<DriverMapPage> {
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
       markers: Set<Marker>.of(_con.markers.values),
+
     );
   }
 
@@ -83,9 +86,10 @@ class _DriverMapPageState extends State<DriverMapPage> {
       margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
       child: ButtonApp(
         onPressed: _con.connect,
+
         text: _con.isConnect ? 'Desconectarse' : 'Conectarse',
-        color: _con.isConnect ? Colors.grey[300] : Colors.amberAccent,
-        textColor: Colors.black,
+        color: _con.isConnect ? Colors.grey: Colors.black,
+        textColor: Colors.white,
       ),
     );
   }
@@ -128,62 +132,64 @@ class _DriverMapPageState extends State<DriverMapPage> {
 
   Widget _drawer(){
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-              child: Column(
-               // mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    child: Text(
-                      _con.driver?.username ?? '',
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
-                      ),
-                      maxLines: 1,
-                    ),
-                  ),
+      child: Container(
+        child: ListView(
 
-                  Container(
-                    child: Text(
-                      _con.driver?.email  ?? '',
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white60,
-                          fontWeight: FontWeight.bold
+
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+                child: Column(
+                 // mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        _con.driver?.username ?? 'nombre completo',
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                        ),
+                        maxLines: 1,
                       ),
-                      maxLines: 1,
                     ),
-                  ),
-                  SizedBox(height: 10,),
-                  CircleAvatar(
-                    backgroundImage: AssetImage('assets/img/profile.jpg'),
-                    radius: 40,
-                  ),
-                ],
+
+                    Container(
+                      child: Text(
+                        _con.driver?.email  ?? 'correo',
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white60,
+                            fontWeight: FontWeight.bold
+                        ),
+                        maxLines: 1,
+                      ),
+                    ),
+                    SizedBox(height: 10,),
+                    CircleAvatar(
+                      backgroundImage: AssetImage('assets/img/profile.jpg'),
+                      radius: 40,
+                    ),
+                  ],
+                ),
+              decoration: BoxDecoration(
+                color: Colors.black54,
               ),
-            decoration: BoxDecoration(
-              color: Colors.black54,
             ),
-          ),
-          ListTile(
-            title: Text(
-              'Editar Perfil'),
-            trailing: Icon(Icons.edit),
-            onTap: () {},
-          ),
-          ListTile(
-            title: Text(
-              'Cerrar sesión'
+            ListTile(
+              title: Text(
+                'Editar Perfil'),
+              trailing: Icon(Icons.edit),
+              onTap: () {},
             ),
-            trailing: Icon(Icons.power_settings_new),
-            onTap: _con.SignOut,
-          ),
-        ],
+            ListTile(
+              title: Text('Cerrar sesión'),
+              trailing: Icon(Icons.power_settings_new),
+              onTap: _con.signOut,
+            ),
+          ],
+        ),
       ),
     );
   }
