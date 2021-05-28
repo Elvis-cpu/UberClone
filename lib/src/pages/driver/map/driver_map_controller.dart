@@ -96,7 +96,7 @@ class DriverMapController {
           CameraPosition(
             bearing: 0,
             target: LatLng(latitude, longitude),
-            zoom: 13.6,
+            zoom: 14.8,
           ),
         ),
       );
