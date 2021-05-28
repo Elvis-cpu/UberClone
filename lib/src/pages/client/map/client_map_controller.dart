@@ -55,7 +55,7 @@ class ClientMapController {
     _driverProvider = new DriverProvider();
     _clientProvider = new ClientProvider();
     _progressDialog = MyProgressDialog.createProgressDialog(context, 'Conectandose...');
-    markerDriver = await createMarkerImageFromAsset('assets/img/taxi_icon.png');
+    markerDriver = await createMarkerImageFromAsset('assets/img/uber_car.png');
     checkGPS();
     getClientInfo();
   }
@@ -234,7 +234,6 @@ class ClientMapController {
         rotation: _position.heading
     );
 
-    markers.clear();
     markers[id] = marker;
 
   }

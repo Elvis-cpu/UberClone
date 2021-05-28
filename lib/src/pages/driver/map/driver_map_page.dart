@@ -134,47 +134,51 @@ class _DriverMapPageState extends State<DriverMapPage> {
     return Drawer(
       child: Container(
         child: ListView(
-
-
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-                child: Column(
-                 // mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
+                    CircleAvatar(
+                    backgroundImage: AssetImage('assets/img/profile.jpg'),
+                    radius: 35,
+                  ),
                     Container(
-                      child: Text(
-                        _con.driver?.username ?? 'nombre completo',
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                        ),
-                        maxLines: 1,
+
+                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 45),
+                      alignment: Alignment.centerRight,
+                      child: Column(
+                       // mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                             Text(
+                              _con.driver?.username ?? 'nombre completo',
+                              style: TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold
+                              ),
+                              maxLines: 1,
+                            ),
+
+
+                            Text(
+                              _con.driver?.email  ?? 'correo',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white60,
+                                  fontWeight: FontWeight.bold
+                              ),
+                              maxLines: 1,
+                            ),
+                        ],
                       ),
                     ),
 
-                    Container(
-                      child: Text(
-                        _con.driver?.email  ?? 'correo',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white60,
-                            fontWeight: FontWeight.bold
-                        ),
-                        maxLines: 1,
-                      ),
-                    ),
-                    SizedBox(height: 10,),
-                    CircleAvatar(
-                      backgroundImage: AssetImage('assets/img/profile.jpg'),
-                      radius: 40,
-                    ),
                   ],
                 ),
               decoration: BoxDecoration(
-                color: Colors.black54,
+                color: Colors.black,
               ),
             ),
             ListTile(
