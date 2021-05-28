@@ -23,7 +23,7 @@ class ClientMapController {
   Completer<GoogleMapController> _mapController = Completer();
 
   CameraPosition initialPosition = CameraPosition(
-      target: LatLng(1.2342774, -77.2645446),
+      target: LatLng(19.2451224, -103.7163459),
       zoom: 14.0
   );
 
@@ -219,14 +219,7 @@ class ClientMapController {
     return bitmapDescriptor;
   }
 
-  void addMarker(
-      String markerId,
-      double lat,
-      double lng,
-      String title,
-      String content,
-      BitmapDescriptor iconMarker
-      ) {
+  void addMarker(String markerId, double lat, double lng, String title, String content, BitmapDescriptor iconMarker) {
 
     MarkerId id = MarkerId(markerId);
     Marker marker = Marker(
