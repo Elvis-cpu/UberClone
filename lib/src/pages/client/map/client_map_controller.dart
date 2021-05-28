@@ -14,6 +14,8 @@ import 'package:uber_clone/src/providers/driver_provider.dart';
 import 'package:uber_clone/src/providers/geofire_provider.dart';
 import 'package:uber_clone/src/utils/my_progress_dialog.dart';
 import 'package:uber_clone/src/utils/snackbar.dart' as utils;
+import 'package:geocoder/geocoder.dart';
+import 'package:geocoding/geocoding.dart';
 
 class ClientMapController {
 
@@ -46,6 +48,14 @@ class ClientMapController {
   StreamSubscription<DocumentSnapshot> _clientInfoSubscription;
 
   Client client;
+
+  String from;// origen que esta almacenando
+  LatLng fromLatLng; // variable que estara cambiando
+
+  bool isFromSelected = true;
+
+  String to;
+  LatLng toLatLng;
 
   Future init(BuildContext context, Function refresh) async {
     this.context = context;
@@ -100,6 +110,47 @@ class ClientMapController {
 
     } catch(error) {
       print('Error en la localizacion: $error');
+    }
+  }
+
+  void changeFromTo(){
+    isFromSelected = !isFromSelected;
+    if (isFromSelected){
+      utils.Snackbar.showSnackbar(context, key, 'Seleccionado el punto de origen');
+    } else{
+      utils.Snackbar.showSnackbar(context, key, 'Seleccionado el destino');
+    }
+  }
+
+  Future<Null> setLocationDraggableInfo () async{
+    if(initialPosition != null){
+      double lat = initialPosition.target.latitude;
+      double lng = initialPosition.target.longitude;
+      List<Placemark> address = await placemarkFromCoordinates(lat, lng);
+      if (address != null){
+        if ( address.length > 0) {
+          String direction = address[0].thoroughfare;
+          String num = address[0].subThoroughfare;
+          String city = address[0].locality;
+          String department = address[0].administrativeArea;
+          String country = address[0].country;
+
+          if (isFromSelected){
+
+            from = '$direction #$num, $city, $department, $country';
+            fromLatLng = new LatLng(lat, lng);
+            print('From: $from');
+            refresh();
+
+          } else {
+            to = '$direction #$num, $city, $department, $country';
+            toLatLng = new LatLng(lat, lng);
+            print('From: $to');
+            refresh();
+          }
+
+        }
+      }
     }
   }
 
