@@ -152,7 +152,7 @@ class _ClientMapPageState extends State<ClientMapPage> {
       alignment: Alignment.bottomLeft,
       margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
       child: ButtonApp(
-        onPressed:(){},
+        onPressed:_con.requestDriver,
         text: 'Solicitar',
         color: Colors.black ,
         textColor: Colors.white,
@@ -223,60 +223,75 @@ class _ClientMapPageState extends State<ClientMapPage> {
 
   Widget _drawer(){
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  child: Text(
-                    _con.client?.username ?? 'Nombre de usuario',
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
+      child: Container(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Container(
+                child: Row(
+                  children: [
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage('assets/img/profile.jpg'),
+                            radius: 35,
+                          ),
+                        ],
+                      ),
                     ),
-                    maxLines: 1,
-                  ),
-                ),
 
-                Container(
-                  child: Text(
-                    _con.client?.email  ?? 'correo',
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white60,
-                        fontWeight: FontWeight.bold
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      child: Column(
+                        // mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _con.client?.username ?? 'nombre completo',
+                            style: TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                            ),
+                            maxLines: 1,
+                          ),
+
+
+                          Text(
+                            _con.client?.email  ?? 'correo',
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white60,
+                                fontWeight: FontWeight.bold
+                            ),
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
                     ),
-                    maxLines: 1,
-                  ),
+                  ],
                 ),
-                SizedBox(height: 10,),
-                CircleAvatar(
-                  backgroundImage: AssetImage('assets/img/profile.jpg'),
-                  radius: 40,
-                ),
-              ],
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black,
+              ),
             ),
-            decoration: BoxDecoration(
-              color: Colors.black54,
+            ListTile(
+              title: Text(
+                  'Editar Perfil'),
+              trailing: Icon(Icons.edit),
+              onTap: () {},
             ),
-          ),
-          ListTile(
-            title: Text(
-                'Editar Perfil'),
-            trailing: Icon(Icons.edit),
-            onTap: () {},
-          ),
-          ListTile(
-            title: Text('Cerrar sesión'),
-            trailing: Icon(Icons.power_settings_new),
-            onTap: _con.signOut,
-          ),
-        ],
+            ListTile(
+              title: Text('Cerrar sesión'),
+              trailing: Icon(Icons.power_settings_new),
+              onTap: _con.signOut,
+            ),
+          ],
+        ),
       ),
     );
   }
