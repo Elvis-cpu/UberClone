@@ -94,38 +94,51 @@ class _ClientMapPageState extends State<ClientMapPage> {
           child: Column(
             crossAxisAlignment:  CrossAxisAlignment.start,
             children: [
-              Text('desde', style: TextStyle(
-                color: Colors.grey,
-                fontSize: 10,
-              ),
-              ),
-              Text(_con.from ?? '', style: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-                maxLines: 2,
-              ),
-               SizedBox(height: 5,),
-               Divider(color: Colors.grey, height: 10,),
+              _infoCardLocation('desde', _con.from ?? '',
+                      () async{
+                    await _con.showGoogleAtoComplete(true);
+                  }),
+
               SizedBox(height: 5,),
-              Text('Hasta', style: TextStyle(
-                color: Colors.grey,
-                fontSize: 10,
-              ),
-              ),
-              Text(_con.to ?? '', style: TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-                maxLines: 2,
-              ),
+              Divider(color: Colors.grey, height: 10,),
+              SizedBox(height: 5,),
+
+              _infoCardLocation('hasta', _con.to ?? 'Ingresa tu destino',
+                      () async{
+                    await _con.showGoogleAtoComplete(false);
+                  }),
+
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _infoCardLocation (String title, String value, Function function){
+    return GestureDetector(
+      onTap: function,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(
+            color: Colors.grey,
+            fontSize: 10,
+          ),
+          ),
+          Text(value,
+            style: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+            maxLines: 2,
+          ),
+
+        ],
+      ),
+    );
+
   }
 
 
@@ -149,12 +162,14 @@ class _ClientMapPageState extends State<ClientMapPage> {
 
   Widget _buttonDrawer() {
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10),
       alignment: Alignment.centerLeft,
       child: IconButton(
         onPressed: _con.openDrawer,
         icon: Icon(
           Icons.menu,
-          color: Colors.white,
+          color: Colors.black,
+          size: 35,
         ),
       ),
     );

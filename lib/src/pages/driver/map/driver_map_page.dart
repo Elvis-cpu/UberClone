@@ -96,12 +96,16 @@ class _DriverMapPageState extends State<DriverMapPage> {
 
   Widget _buttonDrawer() {
     return Container(
+
+      margin: EdgeInsets.symmetric(horizontal: 10) ,
         alignment: Alignment.centerLeft,
         child: IconButton(
           onPressed: _con.openDrawer,
           icon: Icon(
             Icons.menu,
-            color: Colors.white,
+            color: Colors.black,
+            size: 35,
+
           ),
         ),
       );
@@ -121,8 +125,9 @@ class _DriverMapPageState extends State<DriverMapPage> {
             padding: EdgeInsets.all(10),
             child: Icon(
               Icons.location_searching,
-              color: Colors.grey[700],
-              size: 20,
+              color: Colors.black,
+              size: 25,
+
             ),
           ),
         ),
@@ -145,7 +150,7 @@ class _DriverMapPageState extends State<DriverMapPage> {
                   ),
                     Container(
 
-                      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 45),
+                      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 45),
                       alignment: Alignment.centerRight,
                       child: Column(
                        // mainAxisAlignment: MainAxisAlignment.start,

@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as location;
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:uber_clone/src/api/enviroment.dart';
 import 'package:uber_clone/src/models/client.dart';
 import 'package:uber_clone/src/providers/auth_provider.dart';
 import 'package:uber_clone/src/providers/client_provider.dart';
@@ -16,6 +17,8 @@ import 'package:uber_clone/src/utils/my_progress_dialog.dart';
 import 'package:uber_clone/src/utils/snackbar.dart' as utils;
 import 'package:geocoder/geocoder.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_webservice/places.dart' as places;
+import 'package:flutter_google_places/flutter_google_places.dart';
 
 class ClientMapController {
 
@@ -53,6 +56,7 @@ class ClientMapController {
   LatLng fromLatLng; // variable que estara cambiando
 
   bool isFromSelected = true;
+  places.GoogleMapsPlaces _places = places.GoogleMapsPlaces(apiKey: Environment.API_KEY_MAPS);
 
   String to;
   LatLng toLatLng;
@@ -120,6 +124,43 @@ class ClientMapController {
     } else{
       utils.Snackbar.showSnackbar(context, key, 'Seleccionado el destino');
     }
+  }
+
+  Future<Null> showGoogleAtoComplete (bool isFrom) async {
+    places.Prediction p = await PlacesAutocomplete.show(context: context, apiKey: Environment.API_KEY_MAPS,
+    language: 'es',
+    strictbounds: true,
+    radius: 5000,
+    location: places.Location(19.2451468, -103.7146055));
+
+    if(p!=null){
+      places.PlacesDetailsResponse detail = await
+      _places.getDetailsByPlaceId(p.placeId, language: 'es');
+      double lat = detail.result.geometry.location.lat;
+      double lng = detail.result.geometry.location.lng;
+      List<Address> address = await Geocoder.local.findAddressesFromQuery(p.description);
+      if (address != null){
+
+        if(address.length >0){
+          if(detail != null){
+            String direction = detail.result.name;
+            String city = address[0].locality;
+            String department = address[0].adminArea;
+
+            if (isFrom) {
+              from = '$direction, $city, $department';
+              fromLatLng = new LatLng(lat, lng);
+
+            }else{
+              to = '$direction, $city, $department';
+              toLatLng = new LatLng(lat, lng);
+            }
+            refresh();
+          }
+        }
+      }
+    }
+
   }
 
   Future<Null> setLocationDraggableInfo () async{

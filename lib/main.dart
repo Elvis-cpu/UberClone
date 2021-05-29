@@ -31,6 +31,7 @@ class _UbercloneState extends State<UberClone> {
       debugShowCheckedModeBanner: false,
       title: 'Uber Clone',
       initialRoute: 'home',
+
       theme: ThemeData(
           fontFamily: 'NimbusSans',
           appBarTheme: AppBarTheme(elevation: 0),
